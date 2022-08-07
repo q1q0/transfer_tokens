@@ -60,7 +60,7 @@ function ConnectMenu({ bigType = false }) {
 const ConnectButton = styled(Box)`
     ${({ bigType }) => bigType ? 'width: 100%; height: 48px' : 'height: 32px'};
     align-items: center;
-    border-radius: 16px;
+    border-radius: 5px;
     box-shadow: rgb(14 14 44 / 40%) 0px -1px 0px 0px inset;
     cursor: pointer;
     display: inline-flex;
