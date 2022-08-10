@@ -16,9 +16,7 @@ import { addresses } from "../../constants";
 import TextField from '@mui/material/TextField';
 import { numberWithCommas, converNumber2Str } from "../../utils"
 
-let timerid = null;
 function Landing() {
-  const account = useAddress();
   const { chainID, provider, address } = useWeb3Context();
   const [selToken, setToken] = useState(0);
   const [tokenList, setTokenList] = useState([]);

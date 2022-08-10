@@ -1,23 +1,14 @@
-import React, { useState, ReactElement, useContext, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useContext, useMemo, useCallback } from "react";
 import Web3Modal from "web3modal";
-import { StaticJsonRpcProvider, JsonRpcProvider, Web3Provider, WebSocketProvider } from "@ethersproject/providers";
+import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { EnvHelper } from "../helpers/Environment";
 
-/**
- * kept as function to mimic `getMainnetURI()`
- * @returns string
- */
 function getTestnetURI() {
-  return EnvHelper.alchemyTestnetURI;
+  return "https://data-seed-prebsc-1-s2.binance.org:8545";
 }
 
-/**
- * "intelligently" loadbalances production API Keys
- * @returns string
- */
 function getMainnetURI() {
-  // Shuffles the URIs for "intelligent" loadbalancing
   return "https://bsc-dataseed.binance.org";
 }
 
@@ -43,16 +34,12 @@ export const useAddress = () => {
 
 export const Web3ContextProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
-  // NOTE (appleseed): if you are testing on rinkeby you need to set chainId === 4 as the default for non-connected wallet testing...
-  // ... you also need to set getTestnetURI() as the default uri state below
   const [chainID, setChainID] = useState(1);
-  // const [chainID, setChainID] = useState(1);
   const [address, setAddress] = useState("");
 
   const [uri, setUri] = useState(getMainnetURI());
 
   const [provider, setProvider] = useState(new StaticJsonRpcProvider(uri));
-  // const [provider, setProvider] = useState<JsonRpcProvider>(new StaticJsonRpcProvider("https://speedy-nodes-nyc.moralis.io/24036fe0cb35ad4bdc12155f/bsc/testnet"));
 
   const [web3Modal, setWeb3Modal] = useState(
     new Web3Modal({
@@ -78,9 +65,6 @@ export const Web3ContextProvider = ({ children }) => {
     return true;
   };
 
-  // NOTE (appleseed): none of these listeners are needed for Backend API Providers
-  // ... so I changed these listeners so that they only apply to walletProviders, eliminating
-  // ... polling to the backend providers for network changes
   const _initListeners = useCallback(
     rawProvider => {
       if (!rawProvider.on) {
@@ -103,9 +87,6 @@ export const Web3ContextProvider = ({ children }) => {
     [provider],
   );
 
-  /**
-   * throws an error if networkID is not 1 (mainnet) or 4 (rinkeby)
-   */
   const _checkNetwork = (otherChainID) => {
     console.error(
       "You are switching networks",
@@ -128,8 +109,6 @@ export const Web3ContextProvider = ({ children }) => {
   const connect = useCallback(async () => {
     const rawProvider = await web3Modal.connect();
     await web3Modal.toggleModal();
-    // new _initListeners implementation matches Web3Modal Docs
-    // ... see here: https://github.com/Web3Modal/web3modal/blob/2ff929d0e99df5edf6bb9e88cff338ba6d8a3991/example/src/App.tsx#L185
     _initListeners(rawProvider);
     const connectedProvider = new Web3Provider(rawProvider, "any");
 
@@ -141,12 +120,9 @@ export const Web3ContextProvider = ({ children }) => {
       console.error("Wrong network, please switch to bsc mainnet");
       return;
     }
-    // Save everything after we've validated the right network.
-    // Eventually we'll be fine without doing network validations.
+
     setAddress(connectedAddress);
     setProvider(connectedProvider);
-
-    // Keep this at the bottom of the method, to ensure any repaints have the data we need
     setConnected(true);
 
     return connectedProvider;
@@ -166,10 +142,6 @@ export const Web3ContextProvider = ({ children }) => {
     () => ({ connect, disconnect, hasCachedProvider, provider, connected, address, chainID, web3Modal }),
     [connect, disconnect, hasCachedProvider, provider, connected, address, chainID, web3Modal],
   );
-
-  useEffect(() => {
-    // logs non-functioning nodes && returns an array of working mainnet nodes, could be used to optimize connection
-  }, []);
 
   return <Web3Context.Provider value={{ onChainProvider }}>{children}</Web3Context.Provider>;
 };

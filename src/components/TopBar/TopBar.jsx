@@ -2,9 +2,7 @@ import { Box } from "@mui/material";
 import ConnectMenu from "./ConnectMenu.jsx";
 import styled from 'styled-components'
 import { useState, useEffect, useRef } from "react";
-
 import "./topbar.scss";
-
 
 function TopBar({ theme }) {
   const [hamburgeropen, setHamburgerOpen] = useState(false);
