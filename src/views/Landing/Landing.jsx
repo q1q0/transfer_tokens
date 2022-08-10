@@ -57,7 +57,7 @@ function Landing() {
 
   const handleAmount = (e) => {
     if(isNaN(e.target.value)) return;
-    setAmount(Number(e.target.value))
+    setAmount((e.target.value))
   }
 
   const doTransfer = async() => {
