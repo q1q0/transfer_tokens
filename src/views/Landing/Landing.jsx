@@ -2,7 +2,6 @@ import { Box } from "@mui/material";
 import "./Landing.scss";
 // import LPBox from "../../components/LPBox/LPBox";
 import { useState, useEffect } from "react";
-import { useAddress } from "../../hooks";
 import ERC20ABI from "../../abis/ERC20ABI.json";
 import { ethers } from "ethers";
 import { useWeb3Context } from "../../hooks";
@@ -38,17 +37,22 @@ function Landing() {
     loadUserBalance()
   }, [selToken])
 
-    const loadUserBalance = async() => {
-        if(!address) return;
-        const addr = _.get(addresses, [chainID, tokenList[selToken]], "")
-        if(addr === "") return;
-        const tokenContract = new ethers.Contract(addr, ERC20ABI, provider);
+  const loadUserBalance = async() => {
+      if(!address) return;
+      const addr = _.get(addresses, [chainID, tokenList[selToken]], "")
+      if(addr === "") return;
+      const tokenContract = new ethers.Contract(addr, ERC20ABI, provider);
+      try {
         const deci = await tokenContract.decimals();
         const bala = await tokenContract.balanceOf(address) / 10 ** deci;
         setDecimal(deci)
         console.log(deci)
         setBalance(bala)
-    }
+      } catch(e) {
+        console.log(e);
+        alert("Something went wrong....")
+      }
+  }
 
   const handleChange = (event) => {
     setToken(Number(event.target.value));
@@ -56,6 +60,7 @@ function Landing() {
   };
 
   const handleAmount = (e) => {
+    // return when input is not valid for number
     if(isNaN(e.target.value)) return;
     setAmount((e.target.value))
   }
@@ -70,9 +75,14 @@ function Landing() {
     if(addr === "") return;
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(addr, ERC20ABI, signer);
-    const tx = await tokenContract.transfer(addressTo, converNumber2Str(amount, decimal))
-    await tx.wait();
-    console.log(tx)
+    try {
+      const tx = await tokenContract.transfer(addressTo, converNumber2Str(amount, decimal))
+      await tx.wait();
+    } catch (e) {
+      alert("Transaction Failed! Try again.")
+    }
+
+    // updating user balance after transaction
     loadUserBalance();
   }
   return (

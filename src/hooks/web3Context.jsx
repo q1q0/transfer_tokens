@@ -27,6 +27,7 @@ export const useWeb3Context = () => {
   }, [web3Context]);
 };
 
+// define useAddress() hook
 export const useAddress = () => {
   const { address } = useWeb3Context();
   return address;
@@ -70,10 +71,11 @@ export const Web3ContextProvider = ({ children }) => {
       if (!rawProvider.on) {
         return;
       }
+      // when wallet account is changed
       rawProvider.on("accountsChanged", async (accounts) => {
         setTimeout(() => window.location.reload(), 1);
       });
-
+      // when chainId is changed
       rawProvider.on("chainChanged", async (chain) => {
         _checkNetwork(chain);
         setTimeout(() => window.location.reload(), 1);
@@ -93,6 +95,7 @@ export const Web3ContextProvider = ({ children }) => {
       EnvHelper.getOtherChainID(),
       otherChainID === EnvHelper.getOtherChainID() || otherChainID === 4,
     );
+    // when chainID is not test-BSC, it will return false and processes are halt.
     if (chainID !== otherChainID) {
       console.warn("You are switching networks", EnvHelper.getOtherChainID());
       if (otherChainID === EnvHelper.getOtherChainID() || otherChainID === 4) {
