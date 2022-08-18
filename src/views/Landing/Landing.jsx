@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import "./Landing.scss";
-// import LPBox from "../../components/LPBox/LPBox";
 import { useState, useEffect } from "react";
 import ERC20ABI from "../../abis/ERC20ABI.json";
+// import { abi as ERC20ABI } from "../../contract/artifacts/contracts/TestToken.sol/ClassToken.json";
 import { ethers } from "ethers";
 import { useWeb3Context } from "../../hooks";
 import InputLabel from "@mui/material/InputLabel";
